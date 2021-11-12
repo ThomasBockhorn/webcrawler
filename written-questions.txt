@@ -50,9 +50,17 @@ Q4. Identify three (3) different design patterns used in this project, and expla
     libraries use or implement those design patterns.
         - Abstract Factory: PageParserFactory.  The PageParserFactory is created without having to specify
         their concrete class.
-        - Singleton: WordCounts/BufferedReader/BufferedWriter  These are used by both ParallelWebCrawler and SequentialWebCrawler.
-        - Iterator: SequentialWebCrawler/ParallelWebCrawler  These
+        - Singleton: WordCounts/BufferedReader/BufferedWriter  These are used by both ParallelWebCrawler and
+        SequentialWebCrawler.
+        - Iterator: ParallelWebCrawler  This iterators through SingleCrawler and puts them through the parallel threads.
+
     For each pattern, name one thing about the pattern that you LIKED, and one thing you DISLIKED. If you did not like
     anything, you can name two things you disliked.
-
+        -Abstract Factory: I liked that the pattern does not need a concrete instance to be used.  It decouples the
+        class from the classes and initiates the other class.  I dislike how complicated it is.  Concrete implementation
+         is easier to understand.
+        -Singleton:  I like about singleton is that it is easier to implement especially for shared resource.
+        The downside is that a shared resource can cause a problem if the resource breaks down.
+        - Iterator: I like the Iterator when a large amounts of data needs to be processed in some way.  The downside
+        is you have to keep an eye for ending the iteration and the resources it takes.
 
