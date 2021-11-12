@@ -6,6 +6,7 @@ import java.io.Writer;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -64,17 +65,12 @@ final class ProfilerImpl implements Profiler {
   }
 
   @Override
-  public void writeData(Path path) {
+  public void writeData(Path path) throws IOException{
     // TODO: Write the ProfilingState data to the given file path. If a file already exists at that
     //       path, the new data should be appended to the existing file.
 
-    try{
-      Files.write(path, (state.toString() + "\n").getBytes(),
-                  StandardOpenOption.CREATE,
-                  StandardOpenOption.WRITE,
-                  StandardOpenOption.APPEND);
-      } catch(IOException e){
-      e.printStackTrace();
+    try(Writer bufferedWriter = Files.newBufferedWriter(path, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.APPEND)){
+      writeData(bufferedWriter);
     }
   }
 
