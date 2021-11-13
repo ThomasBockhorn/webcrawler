@@ -4,7 +4,6 @@ import com.udacity.webcrawler.parser.PageParser;
 import com.udacity.webcrawler.parser.PageParserFactory;
 
 import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +15,6 @@ import java.util.regex.Pattern;
 
 public class SingleCrawler extends RecursiveAction {
     private final String url;
-    private final Duration timeout;
     private  Clock clock;
     private final int maxDepth;
     private final Map<String, Integer> counts;
@@ -24,13 +22,13 @@ public class SingleCrawler extends RecursiveAction {
     private final Set<String> visitedUrls;
     private final PageParserFactory factory;
     private final int popularWordCount;
+    private final Instant deadline;
 
-    public SingleCrawler(String url, Duration timeout, int maxDepth,
+    public SingleCrawler(String url, Instant deadline, int maxDepth,
                          Map<String, Integer> counts,
                          Set<String> visitedUrls, Clock clock,
                          List<Pattern> ignoredUrls, PageParserFactory factory, int popularWordCount){
         this.url = url;
-        this.timeout = timeout;
         this.maxDepth = maxDepth;
         this.counts = counts;
         this.visitedUrls = visitedUrls;
@@ -38,11 +36,11 @@ public class SingleCrawler extends RecursiveAction {
         this.factory = factory;
         this.popularWordCount = popularWordCount;
         this.clock = clock;
+        this.deadline = deadline;
     }
 
     @Override
     protected void compute(){
-        Instant deadline = clock.instant().plus(timeout);
         if(maxDepth == 0 || clock.instant().isAfter(deadline)){
             return;
         }
@@ -52,11 +50,10 @@ public class SingleCrawler extends RecursiveAction {
             }
         }
 
-        if(visitedUrls.contains(url)){
+        if(!visitedUrls.add(url)){
             return;
         }
 
-        visitedUrls.add(url);
         PageParser.Result result = factory.get(url).parse();
 
         for(ConcurrentMap.Entry<String, Integer> entry : result.getWordCounts().entrySet()){
@@ -65,7 +62,7 @@ public class SingleCrawler extends RecursiveAction {
         List<SingleCrawler> task = new ArrayList<>();
 
         for(String url : result.getLinks()){
-            task.add(new SingleCrawler(url, timeout, maxDepth -1, counts,
+            task.add(new SingleCrawler(url, deadline, maxDepth -1, counts,
                     visitedUrls, clock, ignoredUrls, factory, popularWordCount));
         }
 

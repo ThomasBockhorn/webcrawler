@@ -6,6 +6,7 @@ import com.udacity.webcrawler.parser.PageParserFactory;
 import javax.inject.Inject;
 import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -48,9 +49,10 @@ final class ParallelWebCrawler implements WebCrawler {
   public CrawlResult crawl(List<String> startingUrls) {
     ConcurrentMap<String, Integer> counts = new ConcurrentHashMap<>();
     ConcurrentSkipListSet visitedUrls = new ConcurrentSkipListSet();
+    Instant deadline = clock.instant().plus(timeout);
 
     for(String url : startingUrls){
-      pool.invoke(new SingleCrawler(url, timeout, maxDepth, counts,
+      pool.invoke(new SingleCrawler(url, deadline, maxDepth, counts,
               visitedUrls, clock, ignoredUrls, factory, popularWordCount));
     }
 
