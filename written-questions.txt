@@ -5,14 +5,14 @@ Q1. Run the web crawler using the configurations located at src/main/config/writ
     the sequential crawler and the other always uses the parallel crawler. Inspect the profile output in
     profileData.txt.
 
-    If you are using a multi-processor computer, you should notice that SequentialWebCrawler#crawl and
+    -If you are using a multi-processor computer, you should notice that SequentialWebCrawler#crawl and
     ParallelWebCrawler#crawl took about the same amount of time, but PageParserImpl#parse took much longer when run with
     the ParallelWebCrawler.
 
     Why did the parser take more time when run with ParallelWebCrawler?
-    -The parser uses a linked list implementation to parse.  Linked list will not work in a concurrent system.  They are
-    not thread safe since each node needs to know where the other node is.  In a concurrent system, the processor
-    will assign each node through a tread.  It is not synchronous.
+    -The profiler computes the total time spent to run the parse method.  However, when put into the parallel webcrawler
+    the parse method ran more times.  This increase number of times caused the profileData.txt to show that parse time
+    to be greater
 
 
 Q2. Your manager ran your crawler on her old personal computer, using the configurations from Q1, and she notices that
@@ -20,16 +20,9 @@ Q2. Your manager ran your crawler on her old personal computer, using the config
 
     (a) Suggest one reason why the sequential web crawler was able to read more web pages than the parallel crawler.
         (Hint: Try setting "parallelism" to 1 in the JSON configs to simulate your manager's computer.)
-        -The sequential web crawler can read more pages than the parallel web crawler.  The price is lack of depth of
-        the crawl.  For instance in the sequential web crawler session, the result:
-            {"wordCounts":{"data":151,"udacity":119,"learning":84,"with":62,"machine":56},"urlsVisited":8}
-
-        The parallel web crawler session result:
-            {"wordCounts":{"udacity":1384,"data":1019,"with":826,"program":765,"nanodegree":736},"urlsVisited":65}
-
-        Urls visited changed from 8 to 65.  Concurrent systems may be slower, but they have more threads from which
-        work can be done.  Single threads may be faster than concurrent systems, but you have to sacrifice the amount of
-        work for speed.
+        -Since the manager has an old single thread computer, parallel web crawler with move memory overhead will
+        slow down his machine.  If the manager had a more modern computer with more cores, the parallel web crawler
+        will run better.
 
 
 
@@ -43,8 +36,11 @@ Q3. Analyze your method profiler through the lens of Aspect Oriented Programming
 
     (a) What cross-cutting concern is being addressed by the com.udacity.webcrawler.profiler.Profiler class?
         -The writeData method which depend on the IO writer.  One method writes to the screen.  The other to a file.
+        There is also a wrapper that will profile methods (show performance) in other classes and
+        print them on the screen and on a file.
     (b) What are the join points of the Profiler in the web crawler program?
-        -Both writeData methods and the wrapper method
+        -The join points of the Profiler both methods and the wrapper class that profiles the method from other
+        classes.
 
 Q4. Identify three (3) different design patterns used in this project, and explain which interfaces, classes, and/or
     libraries use or implement those design patterns.
